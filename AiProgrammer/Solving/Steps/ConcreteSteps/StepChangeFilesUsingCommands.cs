@@ -1,5 +1,7 @@
-﻿using AiProgrammer.AiInterface;
+using AiProgrammer.AiInterface;
 using AiProgrammer.IO;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace AiProgrammer.Solving.Steps.ConcreteSteps;
 
@@ -36,24 +38,16 @@ public class StepChangeFilesUsingCommands : ISolverStep
     
     private async Task<FileContent?> TryGetChangeFromCommand(string commandFullString)
     {
-        string[] commandLines = commandFullString.Split('\n');
+        JObject commandObject = JObject.Parse(commandFullString);
+        string actualCommand = commandObject["command"].ToString();
 
-        string actualCommand = commandLines[0];
-
-        if (string.IsNullOrEmpty(actualCommand) && commandLines.Length > 1)
-        {
-            actualCommand = commandLines[1];
-        }
-
-        string[] commandParameters = actualCommand.Split(';');
-
-        if (commandParameters.Length < 2)
+        if (string.IsNullOrEmpty(actualCommand))
         {
             Console.WriteLine($"Provided command is in invalid format. Expected at least two parameters. Command: '{actualCommand}'");
             return null;
         }
 
-        string fileRelativePath = commandParameters[1].Trim();
+        string fileRelativePath = commandObject["filename"].ToString();
 
         string? currentFileContent = await ProjectContentReader.GetFileContent(fileRelativePath);
 

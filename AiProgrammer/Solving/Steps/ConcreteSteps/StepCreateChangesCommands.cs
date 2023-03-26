@@ -1,6 +1,7 @@
-﻿using AiProgrammer.IO;
+using AiProgrammer.IO;
 using AiProgrammer.Solving.Commands;
 using AiProgrammer.Solving.Steps.Helpers;
+using Newtonsoft.Json.Linq;
 
 namespace AiProgrammer.Solving.Steps.ConcreteSteps;
 
@@ -54,6 +55,6 @@ public class StepCreateChangesCommands : ISolverStep
         rawResult = rawResult.ReplaceLineEndings("\n");
 
         string[] commands = rawResult.Split($"\n{CommandsSeparator}\n");
-        return commands;
+        return commands.Select(command => JObject.Parse(command)).ToList();
     }
 }
